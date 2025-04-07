@@ -1,7 +1,65 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 export default function SignupPage() {
+
+    const navigate = useNavigate()
+
+    // create state to handle form input
+    const [formData, setFormData] = useState({
+        name: "",
+        email: "",
+        password: ""
+    })
+
+    // create state to handle error
+    const [error, setError] = useState({})
+
+    // creating input handler
+    function inputHandler(e) {
+        setFormData({
+            ...formData, [e.target.id]: e.target.value
+        });
+        setError({
+            ...error,
+            [e.target.id]: ""
+        })
+    }
+
+    const validate = () => {
+        const newError = {};
+        if (!formData.name.trim()) newError.name = "Name is required"
+
+        if (!formData.email.trim()) {
+            newError.email = "Email is required"
+        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+            newError.email = "Email is not valid"
+        }
+
+        if (!formData.password) {
+            newError.password = "Password is required"
+        } else if (formData.password.length < 6) {
+            newError.password = "Password must be at least 6 characters"
+        }
+
+        return newError
+    }
+
+    // create form submission handler
+    function signUpHandler(e) {
+        e.preventDefault()
+        // validate our form [input]
+        const validationError = validate()
+        if (Object.keys(validationError).length > 0) {
+            setError(validationError)
+            console.log("there's an error")
+        } else {
+            navigate("/profile", {
+                state: formData
+            })
+        }
+    }
+
     const containerStyle = {
         minHeight: "100vh",
         background: "linear-gradient(to bottom right, #cce5ff, #d5bfff)",
@@ -69,30 +127,42 @@ export default function SignupPage() {
         textDecoration: "none"
     };
 
-    const navigate = useNavigate()
-    function signupHandler() {
-        navigate("/profile")
+    const errorStyle = {
+        color: "red",
+        fontSize: "0.8rem",
+        marginTop: "0.25rem"
     }
 
     return (
         <div style={containerStyle}>
             <div style={cardStyle}>
                 <h1 style={titleStyle}>Create Account</h1>
-                <form>
+                <form onSubmit={signUpHandler} >
                     <div style={formGroupStyle}>
                         <label htmlFor="name" style={labelStyle}>Name</label>
-                        <input id="name" type="text" placeholder="Your full name" style={inputStyle} />
+                        <input
+                            value={formData.name}
+                            onChange={inputHandler}
+                            id="name" type="text" placeholder="Your full name" style={inputStyle} />
+                        {error.name && <div style={errorStyle} > {error.name} </div>}
                     </div>
                     <div style={formGroupStyle}>
                         <label htmlFor="email" style={labelStyle}>Email</label>
-                        <input id="email" type="email" placeholder="you@example.com" style={inputStyle} />
+                        <input
+                            value={formData.email}
+                            onChange={inputHandler}
+                            id="email" type="email" placeholder="you@example.com" style={inputStyle} />
+                        {error.email && <div style={errorStyle} > {error.email} </div>}
                     </div>
                     <div style={formGroupStyle}>
                         <label htmlFor="password" style={labelStyle}>Password</label>
-                        <input id="password" type="password" placeholder="••••••••" style={inputStyle} />
+                        <input
+                            value={formData.password}
+                            onChange={inputHandler}
+                            id="password" type="password" placeholder="••••••••" style={inputStyle} />
+                        {error.password && <div style={errorStyle} > {error.password} </div>}
                     </div>
                     <button
-                        onClick={signupHandler}
                         type="submit" style={buttonStyle}>Sign Up</button>
                     <p style={footerStyle}>
                         Already have an account? <Link to="/" >

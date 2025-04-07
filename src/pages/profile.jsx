@@ -1,6 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
+import { useLocation } from "react-router-dom";
 
 export default function ProfilePage() {
+  const location = useLocation()
+  const [userData, setUserData] = useState(location.state ? location.state : null)
+
   const containerStyle = {
     minHeight: "100vh",
     backgroundColor: "#f0f4f8",
@@ -54,14 +58,15 @@ export default function ProfilePage() {
 
   return (
     <div style={containerStyle}>
+      {console.log(userData)}
       <div style={cardStyle}>
         <img
           src="https://www.shutterstock.com/image-vector/default-avatar-profile-icon-transparent-600nw-2534623311.jpg"
           alt="Profile Avatar"
           style={avatarStyle}
         />
-        <div style={nameStyle}>John Doe</div>
-        <div style={emailStyle}>john.doe@example.com</div>
+        <div style={nameStyle}>{userData.name}</div>
+        <div style={emailStyle}>{userData.email}</div>
         <button style={buttonStyle}>Edit Profile</button>
       </div>
     </div>
